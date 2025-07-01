@@ -55,7 +55,7 @@
       document.getElementById("transcript").innerText = "You said: " + text;
 
       try {
-        const res = await fetch("https://fluentnova-proxy.fordailyuse649.repl.co/chat", {
+        const res = await fetch("https://fluentnova-backend.onrender.com/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userInput: text })
