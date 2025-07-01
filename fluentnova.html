@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FluentNova Voice Bot</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 30px;
+      max-width: 500px;
+      margin: auto;
+      background-color: #f9f9f9;
+    }
+    h2 {
+      color: #4A90E2;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      background: #4A90E2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: block;
+      margin: 20px auto;
+      font-size: 1em;
+    }
+    #transcript, #response {
+      margin-top: 20px;
+      font-size: 1.1em;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h2>🎙️ Speak to FluentNova</h2>
+  <button onclick="startListening()">Start Speaking</button>
+  <p id="transcript">Click the button and speak clearly.</p>
+  <p id="response">AI will respond here.</p>
+
+  <script>
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-US';
+
+    function startListening() {
+      recognition.start();
+      document.getElementById("transcript").innerText = "🎧 Listening...";
+    }
+
+    recognition.onresult = async function(event) {
+      const text = event.results[0][0].transcript;
+      document.getElementById("transcript").innerText = "You said: " + text;
+
+      try {
+        const res = await fetch("https://fluentnova-proxy.fordailyuse649.repl.co/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userInput: text })
+        });
+
+        const data = await res.json();
+        const reply = data.reply || "Sorry, no reply received.";
+        document.getElementById("response").innerText = "FluentNova says: " + reply;
+
+        const speak = new SpeechSynthesisUtterance(reply);
+        speechSynthesis.speak(speak);
+      } catch (error) {
+        document.getElementById("response").innerText = "⚠️ Error talking to FluentNova.";
+        console.error("❌ AI Fetch Error:", error);
+      }
+    };
+  </script>
+</body>
+</html>
